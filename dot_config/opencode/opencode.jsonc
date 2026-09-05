@@ -1,0 +1,114 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  "default_agent": "orchestrator",
+  "small_model": "opencode-go/mimo-v2.5",
+  "subagent_depth": 1,
+
+  /*
+   * MODEL SWITCHBOARD
+   *
+   * Fixed:
+   *   orchestrator    = opencode-go/gpt-5.6-luna
+   *   review          = opencode-go/gpt-5.6-luna
+   *
+   * Change these agent model lines below when experimenting:
+   *   explore         = cheap repository reconnaissance
+   *   worker          = normal implementation model
+   *   specialist      = difficult/high-risk implementation
+   *   effort4_worker  = strongest implementation worker for major changes
+   *
+   * Current useful candidates:
+   *
+   * Free / experimental:
+   *   opencode/big-pickle
+   *   opencode/ling-3.0-flash-fin-free
+   *   opencode/mimo-v2.5-free
+   *   opencode/muse-spark-1.2-contributor-free
+   *   opencode/nemotron-3-ultra-free
+   *   opencode/nemotron-3.5-lightning-free
+   *
+   * OpenCode Go:
+   *   opencode-go/deepseek-v4-flash
+   *   opencode-go/deepseek-v4-pro
+   *   opencode-go/glm-5.3
+   *   opencode-go/glm-5.3-flash
+   *   opencode-go/gpt-5.6-luna
+   *   opencode-go/hy3
+   *   opencode-go/hy4-preview
+   *   opencode-go/kimi-k2.7-code
+   *   opencode-go/kimi-k3
+   *   opencode-go/qwen3.8-max
+   */
+
+  "agent": {
+    "orchestrator": {
+      "description": "Owns scope, planning, delegation, integration, Git actions, releases, final verification, and user communication.",
+      "mode": "primary",
+      "model": "opencode-go/gpt-5.6-luna",
+      "permission": {
+        "task": {
+          "*": "deny",
+          "explore": "allow",
+          "worker": "allow",
+          "specialist": "allow",
+          "effort4_worker": "allow",
+          "review": "allow"
+        }
+      }
+    },
+
+    "explore": {
+      "description": "Read-only repository reconnaissance, code tracing, dependency investigation, and focused research.",
+      "mode": "subagent",
+      "model": "opencode-go/deepseek-v4-flash",
+      "steps": 12,
+      "permission": {
+        "edit": "deny",
+        "bash": "deny",
+        "task": "deny"
+      }
+    },
+
+    "worker": {
+      "description": "Handles focused routine implementation, testing, and debugging.",
+      "mode": "subagent",
+      "model": "opencode-go/glm-5.3-flash",
+      "steps": 24,
+      "permission": {
+        "task": "deny"
+      }
+    },
+
+    "specialist": {
+      "description": "Handles genuinely difficult architecture, security, lifecycle, implementation, or debugging work.",
+      "mode": "subagent",
+      "model": "opencode-go/kimi-k2.7-code",
+      "steps": 28,
+      "permission": {
+        "task": "deny"
+      }
+    },
+
+    "effort4_worker": {
+      "description": "Handles focused implementation and testing work for major coordinated changes. Used only for Effort 4.",
+      "mode": "subagent",
+      "model": "opencode-go/kimi-k3",
+      "steps": 36,
+      "permission": {
+        "task": "deny"
+      }
+    },
+
+    "review": {
+      "description": "Independently reviews the integrated change for correctness, regressions, security issues, unnecessary complexity, atomicity problems, scope creep, and missing tests. Does not modify files.",
+      "mode": "subagent",
+      "model": "opencode-go/gpt-5.6-luna",
+      "steps": 16,
+      "permission": {
+        "edit": "deny",
+        "task": "deny"
+      }
+    }
+  }
+}
